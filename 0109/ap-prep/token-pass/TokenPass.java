@@ -16,7 +16,7 @@ public class TokenPass {
         /* to be implemented in part (a) */
         board = new int[playerCount];
         for (int i = 0; i < board.length; i++) {
-            board[i] = (int) (Math.random() * 11);
+            board[i] = (int) (Math.random() * 10) + 1;
         }
         currentPlayer = (int) (Math.random() * (playerCount));
     }
