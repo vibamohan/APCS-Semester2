@@ -32,9 +32,8 @@ public class TokenPass {
      */
     public void distributeCurrentPlayerTokens() {
         /* to be implemented in part (b) */
-        int tokens = board[currentPlayer];
+        int toDistribute = board[currentPlayer];
         board[currentPlayer] = 0;
-        int toDistribute = tokens; 
         int player = currentPlayer;
 
         while (toDistribute > 0) {
