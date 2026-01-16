@@ -1,7 +1,7 @@
 
 public class Split {
 
-    private String email;
+    private final String email;
 
     public Split(String email) {
         this.email = email;
@@ -23,6 +23,7 @@ public class Split {
         return name.substring(dotIndex + 1);
     }
 
+    @Override
     public String toString() {
         return "address: " + email;
     }
