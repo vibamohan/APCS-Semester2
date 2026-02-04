@@ -49,34 +49,16 @@ public class MasterOrder {
      * removed
      */
     public int removeVariety(String cookieVar) {
-        // Iterator<CookieOrder> it = orders.iterator();
-        // int removedBoxes = 0;
-        // while (it.hasNext()) {
-        //     CookieOrder nextCookieOrder = it.next();
-        //     if (nextCookieOrder.getVariety().equals(cookieVar)) {
-        //         removedBoxes += nextCookieOrder.getNumBoxes();
-        //         it.remove();
-        //     }
-        // }
-        // return removedBoxes;
-
-        // int total = orders.stream()
-        //         .filter(c -> c.getVariety().equals(cookieVar))
-        //         .mapToInt(CookieOrder::getNumBoxes)
-        //         .sum();
-        // orders.removeIf(c -> c.getVariety().equals(cookieVar));
-        // return total;
-        AtomicInteger total = new AtomicInteger();
-
-        orders.removeIf(c -> {
-            if (c.getVariety().equals(cookieVar)) {
-                total.addAndGet(c.getNumBoxes());
-                return true;
+        Iterator<CookieOrder> it = orders.iterator();
+        int removedBoxes = 0;
+        while (it.hasNext()) {
+            CookieOrder nextCookieOrder = it.next();
+            if (nextCookieOrder.getVariety().equals(cookieVar)) {
+                removedBoxes += nextCookieOrder.getNumBoxes();
+                it.remove();
             }
-            return false;
-        });
-
-        return total.get();
+        }
+        return removedBoxes;
 
     }
 
