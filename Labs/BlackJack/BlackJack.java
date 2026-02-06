@@ -1,10 +1,10 @@
 
 public final class BlackJack {
 
-    private Card[] deck = new Card[52];
+    private final Card[] deck = new Card[52];
     private int deckIndex = 0;
 
-    private Card[] playerHand = new Card[12];
+    private final Card[] playerHand = new Card[12];
     private int handSize = 0;
 
     private int totalPoints = 20;

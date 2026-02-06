@@ -5,7 +5,7 @@ import java.awt.*;
 public class Table extends JPanel {
 
     private BlackJack game;
-    private JButton hitButton, standButton, playAgainButton;
+    private final JButton hitButton, standButton, playAgainButton;
     private JLabel pointsLabel, totalLabel;
 
     public Table() {
@@ -75,6 +75,7 @@ public class Table extends JPanel {
         }
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
