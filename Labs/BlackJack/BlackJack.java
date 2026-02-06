@@ -1,12 +1,12 @@
 
-import java.util.Random;
-
 public final class BlackJack {
 
     private Card[] deck = new Card[52];
     private int deckIndex = 0;
+
     private Card[] playerHand = new Card[12];
     private int handSize = 0;
+
     private int totalPoints = 20;
     private boolean gameOver = false;
 
@@ -21,6 +21,7 @@ public final class BlackJack {
         String[] suits = {"Diamonds", "Hearts", "Spades", "Clubs"};
         String[] names = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
         int[] values = {2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11};
+
         int index = 0;
         for (String suit : suits) {
             for (int i = 0; i < names.length; i++) {
@@ -30,9 +31,8 @@ public final class BlackJack {
     }
 
     public void shuffleDeck() {
-        Random rand = new Random();
-        for (int i = 0; i < deck.length; i++) {
-            int j = rand.nextInt(deck.length);
+        for (int i = deck.length - 1; i > 0; i--) {
+            int j = (int) (Math.random() * (i + 1));
             Card temp = deck[i];
             deck[i] = deck[j];
             deck[j] = temp;
@@ -41,11 +41,15 @@ public final class BlackJack {
     }
 
     public void dealCard() {
-        if (deckIndex < deck.length && !gameOver) {
-            playerHand[handSize++] = deck[deckIndex++];
-            if (calculateHandValue() > 21) {
-                gameOver = true;
-            }
+        if (gameOver || deckIndex >= deck.length) {
+            gameOver = true;
+            return;
+        }
+
+        playerHand[handSize++] = deck[deckIndex++];
+
+        if (calculateHandValue() > 21) {
+            gameOver = true;
         }
     }
 
@@ -59,23 +63,30 @@ public final class BlackJack {
 
     public void hit() {
         dealCard();
+        AudioPlayer.get().playSound("assets/sounds/hit.wav");
     }
 
     public void stand() {
         gameOver = true;
+        AudioPlayer.get().playSound("assets/sounds/stand.wav");
     }
 
     public void newGame() {
-        if (totalPoints > 0) {
+        if (totalPoints > 0 && gameOver) {
             totalPoints--;
             handSize = 0;
             deckIndex = 0;
             gameOver = false;
+
             initializeDeck();
             shuffleDeck();
             dealCard();
             dealCard();
         }
+    }
+
+    public void addPoints(int points) {
+        totalPoints += points;
     }
 
     public Card[] getPlayerHand() {
@@ -96,6 +107,7 @@ public final class BlackJack {
 
     public int calculatePointsWon() {
         int value = calculateHandValue();
+
         if (value == 21) {
             return 5;
         }
@@ -108,6 +120,7 @@ public final class BlackJack {
         if (value == 17 || value == 16) {
             return 1;
         }
+
         return 0;
     }
 }

@@ -1,7 +1,5 @@
 
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.nio.Buffer;
 
 public class Card {
 
@@ -16,18 +14,12 @@ public class Card {
         this.value = value;
     }
 
-    private void generateImageName() {
-        String imageName = suit + "-" + name + "-" + value + ".png";
-        image = GameImage()
-        
+    public String getSuit() {
+        return suit;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getSuit() {
-        return suit;
     }
 
     public int getValue() {

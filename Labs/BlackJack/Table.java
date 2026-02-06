@@ -1,7 +1,6 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class Table extends JPanel {
 
@@ -12,6 +11,7 @@ public class Table extends JPanel {
     public Table() {
         game = new BlackJack();
         setLayout(null);
+
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
         playAgainButton = new JButton("Play Again");
@@ -35,7 +35,7 @@ public class Table extends JPanel {
                 game.hit();
                 totalLabel.setText("Total: " + game.calculateHandValue());
                 if (game.isGameOver()) {
-                    showPoints();
+                    showResult();
                 }
                 repaint();
             }
@@ -44,30 +44,75 @@ public class Table extends JPanel {
         standButton.addActionListener(e -> {
             if (!game.isGameOver()) {
                 game.stand();
-                showPoints();
+                showResult();
             }
         });
 
         playAgainButton.addActionListener(e -> {
-            game.newGame();
-            pointsLabel.setText("Points: " + game.getTotalPoints());
-            totalLabel.setText("Total: " + game.calculateHandValue());
-            repaint();
+            if (game.isGameOver()) {
+                game.newGame();
+                pointsLabel.setText("Points: " + game.getTotalPoints());
+                totalLabel.setText("Total: " + game.calculateHandValue());
+                repaint();
+            }
         });
     }
 
-    private void showPoints() {
+    private void showResult() {
         int won = game.calculatePointsWon();
-        JOptionPane.showMessageDialog(this, "You won " + won + " points!");
-        pointsLabel.setText("Points: " + (game.getTotalPoints() + won));
+
+        if (won > 0) {
+            game.addPoints(won);
+            JOptionPane.showMessageDialog(this, "You won " + won + " points!");
+        } else {
+            JOptionPane.showMessageDialog(this, "You lost!");
+        }
+
+        pointsLabel.setText("Points: " + game.getTotalPoints());
+
+        if (game.isGameOver()) {
+            JOptionPane.showMessageDialog(this, "Game is over");
+        }
     }
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
         Card[] hand = game.getPlayerHand();
         for (int i = 0; i < game.getHandSize(); i++) {
-            g.drawRect(50 + i * 70, 50, 60, 90);
-            g.drawString(hand[i].toString(), 55 + i * 70, 100);
+            int x = 50 + i * 70;
+            g.drawRect(x, 50, 60, 90);
+            g.drawString(hand[i].getName(), x + 5, 80);
+            g.drawString(hand[i].getSuit(), x + 5, 95);
+        }
+
+        int tableX = 500;
+        int tableY = 50;
+        int rowHeight = 25;
+        int col1Width = 50;
+        int col2Width = 50;
+
+        g.setColor(Color.BLACK);
+        g.drawRect(tableX, tableY, col1Width, rowHeight);
+        g.drawRect(tableX + col1Width, tableY, col2Width, rowHeight);
+        g.drawString("Value", tableX + 5, tableY + 17);
+        g.drawString("Pts", tableX + col1Width + 5, tableY + 17);
+
+        int[][] table = {
+            {21, 5},
+            {20, 3},
+            {19, 2},
+            {18, 2},
+            {17, 1},
+            {16, 1}
+        };
+
+        for (int i = 0; i < table.length; i++) {
+            int y = tableY + (i + 1) * rowHeight;
+            g.drawRect(tableX, y, col1Width, rowHeight);
+            g.drawRect(tableX + col1Width, y, col2Width, rowHeight);
+            g.drawString(String.valueOf(table[i][0]), tableX + 10, y + 17);
+            g.drawString(String.valueOf(table[i][1]), tableX + col1Width + 10, y + 17);
         }
     }
 }
