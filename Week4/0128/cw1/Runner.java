@@ -8,7 +8,7 @@ public class Runner {
         //java.util.ArrayList
         //What do you think the ? in ArrayList< ? > represents?
         // type of objects being stored (Song)
-        ArrayList<Song> songList1 = new ArrayList<Song>();
+        ArrayList<Song> songList1 = new ArrayList<>();
         ArrayList<Song> songList2 = new ArrayList<>();
 
         //What do you think the method add() does?
