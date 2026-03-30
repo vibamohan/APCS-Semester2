@@ -1,26 +1,26 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-public class Screen extends JPanel implements MouseListener {
+public class Screen extends JPanel implements MouseListener, MouseMotionListener {
 
-    private int rows = 10, cols = 10;
-    private int gridSize = 40;
+    private int rows = 40, cols = 40;
+    private int gridSize = 10;
     private Square[][] grid;
 
     private Color selectedColor = Color.BLACK;
+    private Color hoverColor = null;
 
-    // Huge palette
+    // Palette
     private java.util.List<Square> paletteSquares = new ArrayList<>();
     private java.util.List<Rectangle> paletteRects = new ArrayList<>();
     private int paletteStartX = 450;
     private int paletteStartY = 20;
+    private int paletteCols = 30;
+    private int paletteRows = 30;
     private int paletteSquareSize = 15;
-    private int paletteCols = 30; // number of squares horizontally
-    private int paletteRows = 30; // number of squares vertically
 
     // Buttons
     private Rectangle clearButton = new Rectangle(450, 500, 80, 40);
@@ -29,24 +29,20 @@ public class Screen extends JPanel implements MouseListener {
 
     public Screen() {
         grid = new Square[rows][cols];
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
                 grid[r][c] = new Square(Color.WHITE);
-            }
-        }
 
         setupPalette();
         addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     private void setupPalette() {
-        // Generate full spectrum palette
         for (int y = 0; y < paletteRows; y++) {
             for (int x = 0; x < paletteCols; x++) {
-
-                // Use HSV color model for smooth gradient
-                float hue = (float) x / (paletteCols - 1);      // 0.0 to 1.0
-                float brightness = 1.0f - (float) y / (paletteRows - 1); // 1.0 to 0.0
+                float hue = (float) x / (paletteCols - 1);
+                float brightness = 1.0f - (float) y / (paletteRows - 1);
                 float saturation = 1.0f;
 
                 Color color = Color.getHSBColor(hue, saturation, brightness);
@@ -65,19 +61,37 @@ public class Screen extends JPanel implements MouseListener {
         drawGrid(g);
         drawPalette(g);
         drawButtons(g);
+        drawHoverPreview(g);
     }
 
     private void drawGrid(Graphics g) {
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
                 grid[r][c].drawMe(g, c * gridSize, r * gridSize, gridSize);
-            }
-        }
     }
 
     private void drawPalette(Graphics g) {
         for (int i = 0; i < paletteSquares.size(); i++) {
             paletteSquares.get(i).drawMe(g, paletteRects.get(i).x, paletteRects.get(i).y, paletteSquareSize);
+        }
+
+        for (int i = 0; i < paletteSquares.size(); i++) {
+            if (paletteSquares.get(i).getColor().equals(selectedColor)) {
+                Rectangle r = paletteRects.get(i);
+                g.setColor(Color.WHITE);
+                ((Graphics2D) g).setStroke(new BasicStroke(3));
+                g.drawRect(r.x - 1, r.y - 1, r.width + 2, r.height + 2);
+            }
+        }
+    }
+
+    private void drawHoverPreview(Graphics g) {
+        if (hoverColor != null) {
+            g.setColor(hoverColor);
+            g.fillRect(450, 460, 50, 30);
+            g.setColor(Color.BLACK);
+            g.drawRect(450, 460, 50, 30);
+            g.drawString("Hover", 510, 480);
         }
     }
 
@@ -105,91 +119,80 @@ public class Screen extends JPanel implements MouseListener {
     private void handleGridClick(int x, int y) {
         int col = x / gridSize;
         int row = y / gridSize;
-        if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        if (row >= 0 && row < rows && col >= 0 && col < cols)
             grid[row][col].setColor(selectedColor);
-        }
     }
 
     private void handlePaletteClick(int x, int y) {
-        for (int i = 0; i < paletteRects.size(); i++) {
+        for (int i = 0; i < paletteRects.size(); i++)
             if (paletteRects.get(i).contains(x, y)) {
                 selectedColor = paletteSquares.get(i).getColor();
                 return;
             }
-        }
     }
 
     private void handleButtons(int x, int y) {
-        if (clearButton.contains(x, y)) {
-            clearGrid();
-        }
-        if (saveButton.contains(x, y)) {
-            saveImage();
-        }
-        if (loadButton.contains(x, y)) {
-            loadImage();
-        }
+        if (clearButton.contains(x, y)) clearGrid();
+        if (saveButton.contains(x, y)) saveImage();
+        if (loadButton.contains(x, y)) loadImage();
     }
 
     private void clearGrid() {
-        for (Square[] row : grid) {
-            for (Square s : row) {
-                s.setColor(Color.WHITE);
-            }
-        }
+        for (Square[] row : grid)
+            for (Square s : row) s.setColor(Color.WHITE);
     }
 
     private void saveImage() {
         String name = JOptionPane.showInputDialog("Enter filename:");
-        if (name == null) {
-            return;
-        }
+        if (name == null) return;
         try {
             PrintWriter out = new PrintWriter(name + ".txt");
             for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < cols; c++) {
+                for (int c = 0; c < cols; c++)
                     out.print(grid[r][c].getColor().getRGB() + " ");
-                }
                 out.println();
             }
             out.close();
-        } catch (Exception e) {
-            System.out.println("Save error");
-        }
+        } catch (Exception e) { System.out.println("Save error"); }
     }
 
     private void loadImage() {
         String name = JOptionPane.showInputDialog("Enter filename:");
-        if (name == null) {
-            return;
-        }
+        if (name == null) return;
         try {
             Scanner scan = new Scanner(new File(name + ".txt"));
             for (int r = 0; r < rows; r++) {
                 String[] nums = scan.nextLine().split(" ");
-                for (int c = 0; c < cols; c++) {
+                for (int c = 0; c < cols; c++)
                     grid[r][c].setColor(new Color(Integer.parseInt(nums[c])));
-                }
             }
             scan.close();
-        } catch (Exception e) {
-            System.out.println("Load error");
+        } catch (Exception e) { System.out.println("Load error"); }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        hoverColor = null;
+        int x = e.getX(), y = e.getY();
+        for (int i = 0; i < paletteRects.size(); i++) {
+            if (paletteRects.get(i).contains(x, y)) {
+                hoverColor = paletteSquares.get(i).getColor();
+                break;
+            }
         }
+        repaint();
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseDragged(MouseEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+
+        handleGridClick(x, y);
+        repaint();
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
+    @Override public void mouseReleased(MouseEvent e) { }
+    @Override public void mouseClicked(MouseEvent e) { }
+    @Override public void mouseEntered(MouseEvent e) { }
+    @Override public void mouseExited(MouseEvent e) { }
 }
