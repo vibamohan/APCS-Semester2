@@ -14,7 +14,7 @@ public class WordChecker {
     /**
      * Returns true if each element of wordList (except the first) contains the
      * previous element as a substring and returns false otherwise, as described
-     * in part (a) Precondition: wordList contains at least two elements.
+     * in part (a) Precondition: wordList contains at least two elements
      * Postcondition: wordList is unchanged.
      */
     public boolean isWordChain() {
